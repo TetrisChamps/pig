@@ -22,7 +22,7 @@ public class Pig {
     void program() {
         //test();                 // <-------------- Uncomment to run tests!
 
-        final int winPts = 20;    // Points to win
+        final int winPts = 100;    // Points to win
         Player[] players;         // The players (array of Player objects)
         Player actual;            // Actual player for round (must use)
         boolean aborted = false;  // Game aborted by player?
@@ -35,27 +35,39 @@ public class Pig {
         actual = players[playerIndex];
 
         welcomeMsg(winPts);
-        statusMsg(players);
 
 
         // TODO Game logic, using small step, functional decomposition
-        while (true) {
+        while (!aborted) {
+            /* ----- Input ----- */
             String choice = getPlayerChoice(actual);
-            if (choice.equals("r")){
-                actual.roundPts = rand.nextInt(6) + 1;
-            }
-            else if(choice.equals("n")){
-                if(players[playerIndex + 1] != null){
 
+            /* ----- Logic ----- */
+            if (choice.equals("r")) {
+                int rollValue = rand.nextInt(6) + 1;
+                actual.roundPts += rollValue;
+                roundMsg(rollValue, actual);
+                if (rollValue == 1) {
+                    playerIndex = ++playerIndex % players.length;
+                    actual.roundPts = 0;
                 }
-                else{
-                    playerIndex = 0;
-                }
+            } else if (choice.equals("n")) {
+                playerIndex = ++playerIndex % players.length;
+                actual.totalPts += actual.roundPts;
+                actual.roundPts = 0;
+            } else if (choice.equals("q")) {
+                aborted = true;
             }
-            else if(choice.equals("q")){
 
+            if (actual.totalPts >= winPts) {
+                gameOverMsg(actual, aborted);
             }
+            System.out.println(playerIndex);
+            actual = players[playerIndex];
+            statusMsg(players);
+
         }
+
 
         //gameOverMsg(actual, aborted);
     }
@@ -63,6 +75,7 @@ public class Pig {
     // ---- Game logic methods --------------
 
     // TODO
+
 
     // ---- IO methods ------------------
 
@@ -107,10 +120,11 @@ public class Pig {
         // TODO
         out.print("Enter number of players: ");
         int numberOfPlayers = sc.nextInt();
+        sc.nextLine();
         Player players[] = new Player[numberOfPlayers];
         for (int i = 0; i < players.length; i++) {
             out.print("Enter player " + (i + 1) + " name: ");
-            String name = sc.next();
+            String name = sc.nextLine();
             players[i] = new Player(name);
         }
 
@@ -124,6 +138,7 @@ public class Pig {
         String name;     // Default null
         int totalPts;    // Total points for all rounds, default 0
         int roundPts;    // Points for a single round, default 0
+
         Player(String name) {
             this.name = name;
         }
