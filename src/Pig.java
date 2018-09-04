@@ -26,16 +26,36 @@ public class Pig {
         Player[] players;         // The players (array of Player objects)
         Player actual;            // Actual player for round (must use)
         boolean aborted = false;  // Game aborted by player?
+        int playerIndex = 0;
 
         // Hard coded 2 players, replace *last* of all with ...
-        players = new Player[]{new Player("Olle"), new Player("Fia")};
-        //players = getPlayers();  // ... this (method to read in all players)
+        //players = new Player[]{new Player("Olle"), new Player("Fia")};
+        players = getPlayers();  // ... this (method to read in all players)
+
+        actual = players[playerIndex];
 
         welcomeMsg(winPts);
         statusMsg(players);
 
 
         // TODO Game logic, using small step, functional decomposition
+        while (true) {
+            String choice = getPlayerChoice(actual);
+            if (choice.equals("r")){
+                actual.roundPts = rand.nextInt(6) + 1;
+            }
+            else if(choice.equals("n")){
+                if(players[playerIndex + 1] != null){
+
+                }
+                else{
+                    playerIndex = 0;
+                }
+            }
+            else if(choice.equals("q")){
+
+            }
+        }
 
         //gameOverMsg(actual, aborted);
     }
@@ -56,7 +76,7 @@ public class Pig {
     void statusMsg(Player[] players) {
         out.print("Points: ");
         for (int i = 0; i < players.length; i++) {
-            out.print(players[i].name + " = " + players[i].totalPts + " ");
+            out.println(players[i].name + " = " + players[i].totalPts + " ");
         }
         out.println();
     }
@@ -79,13 +99,22 @@ public class Pig {
     }
 
     String getPlayerChoice(Player player) {
-        out.print("Player is " + player.name + " > ");
+        out.print("Player is " + player.name + ": ");
         return sc.nextLine();
     }
 
     Player[] getPlayers() {
         // TODO
-        return null;
+        out.print("Enter number of players: ");
+        int numberOfPlayers = sc.nextInt();
+        Player players[] = new Player[numberOfPlayers];
+        for (int i = 0; i < players.length; i++) {
+            out.print("Enter player " + (i + 1) + " name: ");
+            String name = sc.next();
+            players[i] = new Player(name);
+        }
+
+        return players;
     }
 
     // ---------- Class -------------
