@@ -22,7 +22,7 @@ public class Pig {
     void program() {
         //test();                 // <-------------- Uncomment to run tests!
 
-        final int winPts = 100;    // Points to win
+        final int winPts = 20;    // Points to win
         Player[] players;         // The players (array of Player objects)
         Player actual;            // Actual player for round (must use)
         boolean aborted = false;  // Game aborted by player?
@@ -40,42 +40,46 @@ public class Pig {
         // TODO Game logic, using small step, functional decomposition
         while (!aborted) {
             /* ----- Input ----- */
-            String choice = getPlayerChoice(actual);
+            String choice;
+            while (true) {
+                choice = getPlayerChoice(actual).toLowerCase();
+                if (choice.equals("r") || choice.equals("n") || choice.equals("q")) {
+                    break;
+                }
+                out.println("Bad input, please choose between (r)oll, (n)ext, or (q)uit!");
+            }
 
             /* ----- Logic ----- */
             if (choice.equals("r")) {
                 int rollValue = rand.nextInt(6) + 1;
                 actual.roundPts += rollValue;
+                if (actual.roundPts + actual.totalPts >= winPts) {
+                    statusMsg(players);
+                    break;
+                }
                 roundMsg(rollValue, actual);
                 if (rollValue == 1) {
-                    playerIndex = ++playerIndex % players.length;
+                    playerIndex = getNextPlayerIndex(playerIndex, players.length);
                     actual.roundPts = 0;
                 }
             } else if (choice.equals("n")) {
-                playerIndex = ++playerIndex % players.length;
+                playerIndex = getNextPlayerIndex(playerIndex, players.length);
                 actual.totalPts += actual.roundPts;
                 actual.roundPts = 0;
             } else if (choice.equals("q")) {
                 aborted = true;
             }
-
-            if (actual.totalPts >= winPts) {
-                gameOverMsg(actual, aborted);
-            }
-            System.out.println(playerIndex);
             actual = players[playerIndex];
             statusMsg(players);
-
         }
 
-
-        //gameOverMsg(actual, aborted);
+        gameOverMsg(actual, aborted);
     }
 
     // ---- Game logic methods --------------
-
-    // TODO
-
+    int getNextPlayerIndex(int playerIndex, int length) {
+        return ++playerIndex % length;
+    }
 
     // ---- IO methods ------------------
 
@@ -119,7 +123,14 @@ public class Pig {
     Player[] getPlayers() {
         // TODO
         out.print("Enter number of players: ");
-        int numberOfPlayers = sc.nextInt();
+        int numberOfPlayers = 0;
+        try {
+            numberOfPlayers = sc.nextInt();
+        }
+        catch (Exception e) {
+            out.println("Number of players must be 1 or greater...");
+            exit(-1);
+        }
         sc.nextLine();
         Player players[] = new Player[numberOfPlayers];
         for (int i = 0; i < players.length; i++) {
@@ -151,7 +162,8 @@ public class Pig {
         // This is hard coded test data, an array of Players 
         Player[] players = {new Player("a"), new Player("b"), new Player("c")};
 
-
+        out.append('p');
+        out.print("");
 
         exit(0);   // End program
     }
